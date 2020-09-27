@@ -22,7 +22,7 @@ func NewClient(authToken string) *Client {
 		BaseURL:   apiURLv1,
 		authToken: authToken,
 		HTTPClient: &http.Client{
-			Timeout: time.Minute,
+			Timeout: time.Minute*5,
 		},
 	}
 }
