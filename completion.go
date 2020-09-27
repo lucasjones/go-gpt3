@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -15,7 +16,8 @@ type CompletionRequest struct {
 	Temperature float32 `json:"temperature,omitempty"`
 	TopP        float32 `json:"top_p,omitempty"`
 
-	N int `json:"n,omitempty"`
+	BestOf int `json:"best_of,omitempty"`
+	N      int `json:"n,omitempty"`
 
 	LogProbs int `json:"logprobs,omitempty"`
 
@@ -45,7 +47,7 @@ type CompletionResponse struct {
 	Object  string   `json:"object"`
 	Created uint64   `json:"created"`
 	Model   string   `json:"model"`
-	Сhoices []Choice `json:"choices"`
+	Choices []Choice `json:"choices"`
 }
 
 // CreateCompletion — API call to create a completion. This is the main endpoint of the API. Returns new text as well as, if requested, the probabilities over each alternative token at each position.
@@ -64,5 +66,10 @@ func (c *Client) CreateCompletion(ctx context.Context, engineID string, request 
 
 	req = req.WithContext(ctx)
 	err = c.sendRequest(req, &response)
+	if err != nil {
+		data, _ := ioutil.ReadAll(req.Body)
+		fmt.Printf("[gogpt] error response data: %v\n", err, string(data))
+		return
+	}
 	return
 }
